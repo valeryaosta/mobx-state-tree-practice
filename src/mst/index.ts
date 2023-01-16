@@ -6,6 +6,14 @@ const EmployeeModel = types.model("Employee", {
     id: types.identifier,
     name: types.string,
     hours_worked: types.number,
+}).actions(self => {
+    function editEmployee(name: string, hours_worked: number) {
+        applySnapshot(self, {
+            ...self, name, hours_worked
+        })
+    }
+
+    return {editEmployee}
 });
 
 const EmployerModel = types.model("Employer", {
@@ -20,6 +28,7 @@ const EmployerModel = types.model("Employer", {
             ...self, employees: [{id, name, hours_worked}, ...self.employees]
         })
     }
+
     return {newEmployee}
 }).views(self => ({
     get num_employees() {

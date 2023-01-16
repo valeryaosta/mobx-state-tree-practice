@@ -1,5 +1,6 @@
-import {applySnapshot, Instance, types} from "mobx-state-tree";
-import { v4 as uuidv4 } from 'uuid';
+import {applySnapshot, flow, Instance, onSnapshot, types} from "mobx-state-tree";
+import {v4 as uuidv4} from 'uuid';
+import api from "axios";
 
 
 const EmployeeModel = types.model("Employee", {
@@ -29,7 +30,21 @@ const EmployerModel = types.model("Employer", {
         })
     }
 
-    return {newEmployee}
+    const save = flow(function* save(snapshot: any) {
+        try {
+            const response = yield api.post('/employers', {snapshot})
+            console.log('response', response)
+        } catch (e) {
+            console.log('error', e)
+        }
+
+    })
+
+    function afterCreate() {
+        onSnapshot(self, (snapshot) => save(snapshot))
+    }
+
+    return {newEmployee, afterCreate}
 }).views(self => ({
     get num_employees() {
         return self.employees.length

@@ -21,7 +21,11 @@ const EmployerModel = types.model("Employer", {
         })
     }
     return {newEmployee}
-});
+}).views(self => ({
+    get num_employees() {
+        return self.employees.length
+    }
+}));
 
 const RootModel = types.model("Root", {
     employer: EmployerModel

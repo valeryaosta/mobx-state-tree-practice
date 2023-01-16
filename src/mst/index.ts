@@ -24,7 +24,10 @@ const EmployerModel = types.model("Employer", {
 }).views(self => ({
     get num_employees() {
         return self.employees.length
-    }
+    },
+    filtered_employees(searchString: string) {
+        return self.employees.filter(employee => employee.name.includes(searchString))
+    },
 }));
 
 const RootModel = types.model("Root", {

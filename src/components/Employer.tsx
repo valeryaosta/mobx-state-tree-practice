@@ -10,6 +10,7 @@ interface EmployerComponentProps {
 interface EmployerComponentState {
     employeeName: string,
     hours_worked: string,
+    searchString: string,
 }
 
 @inject("rootTree")
@@ -20,6 +21,7 @@ class EmployerComponent extends React.Component<EmployerComponentProps, Employer
         this.state = {
             employeeName: '',
             hours_worked: '',
+            searchString: '',
         };
     }
 
@@ -33,19 +35,26 @@ class EmployerComponent extends React.Component<EmployerComponentProps, Employer
         this.setState({hours_worked});
     }
 
+    searchStringChange = (e: any) => {
+        const searchString = e.target.value;
+        this.setState({searchString});
+    }
+
     onSubmit = (e: any) => {
         e.preventDefault();
         const {employeeName, hours_worked} = this.state;
         const {rootTree} = this.props;
         if(!rootTree) return null;
         rootTree.employer.newEmployee(employeeName, parseInt(hours_worked));
+        this.setState({employeeName: '', hours_worked: ''});
     }
 
     render() {
         const {rootTree} = this.props;
-        const {employeeName, hours_worked} = this.state;
+        const {employeeName, hours_worked, searchString} = this.state;
         if (!rootTree) return null;
         const num_employess = rootTree.employer.num_employees;
+        const filtered_employees = rootTree.employer.filtered_employees(searchString);
 
         return (
             <div>
@@ -63,8 +72,12 @@ class EmployerComponent extends React.Component<EmployerComponentProps, Employer
                     <button>Submit</button>
                 </form>
                 <hr/>
-                {rootTree.employer.employees.map(employee => (
-                     <EmployeeComponent key={employee.id} employee={employee} />
+                <input placeholder="Search Employee Name"
+                       value={searchString}
+                       onChange={this.searchStringChange}
+                />
+                {filtered_employees.map(employee => (
+                    <EmployeeComponent key={employee.id} employee={employee} />
                 ))}
             </div>
         )
